@@ -4,7 +4,12 @@ import React, { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
-import { IoClose, IoPencil } from "react-icons/io5";
+import {
+  IoCheckmarkCircle,
+  IoClose,
+  IoEllipseOutline,
+  IoPencil,
+} from "react-icons/io5";
 
 import { api } from "~/utils/api";
 import { type Todo } from "@prisma/client";
@@ -47,7 +52,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex h-screen w-screen items-center justify-center">
         <div className="flex w-80 flex-col gap-5">
-          <p>NEXTODO</p>
+          <p className="font-semibold">NEXTODO</p>
           <div className="flex w-full gap-2">
             <Input
               type="text"
@@ -64,30 +69,42 @@ const Home: NextPage = () => {
               // type="submit"
               onClick={() => {
                 selectTodo
-                  ? updateTodo({ text: todoInput, id: selectTodo.id })
+                  ? todoInput == ""
+                    ? setSelectTodo(null)
+                    : updateTodo({ text: todoInput, id: selectTodo.id })
                   : create({ text: todoInput });
               }}
             >
-              {selectTodo ? "Update" : "Add"}
+              {selectTodo ? (todoInput == "" ? "Cancel" : "Update") : "Add"}
             </Button>
           </div>
-          <div className="h-80">
+          <div className="h-80 rounded-lg border border-gray-200">
             <ScrollArea.Root className="scrollbar-thin scrollbar-thumb-mauve-10 scrollbar-track-blackA6 scrollbar-thumb-rounded scrollbar-track-rounded h-full w-full overflow-hidden">
               <ScrollArea.Viewport className="h-full">
                 {todos.data?.map((todo) => (
                   <div
                     key={todo.id}
                     className="mb-1 flex items-center justify-between rounded-lg p-2.5 hover:bg-gray-50"
-                    onClick={() => {
-                      toggleComplete({
-                        id: todo.id,
-                        isComplete: !todo.isCompleted,
-                      });
-                    }}
                   >
-                    <p className={todo.isCompleted ? "line-through" : ""}>
-                      {todo.todo}
-                    </p>
+                    <button
+                      className="mr-2 rounded-sm text-gray-400 hover:text-black"
+                      onClick={() => {
+                        toggleComplete({
+                          id: todo.id,
+                          isComplete: !todo.isCompleted,
+                        });
+                      }}
+                    >
+                      {todo.isCompleted ? (
+                        <IoCheckmarkCircle
+                          size={18}
+                          className="text-green-600"
+                        />
+                      ) : (
+                        <IoEllipseOutline size={18} />
+                      )}
+                    </button>
+                    <p className={"w-full"}>{todo.todo}</p>
                     <div className="flex gap-2.5">
                       <button
                         className="rounded-sm text-gray-400 hover:text-black"
@@ -99,15 +116,10 @@ const Home: NextPage = () => {
                         <IoPencil size={18} />
                       </button>
                       <button
-                        className="rounded-sm text-gray-400 hover:text-black"
+                        className="rounded-sm text-gray-400 hover:text-red-500"
                         onClick={() => deleteTodo({ id: todo.id })}
                       >
                         <IoClose size={18} />
-                        {/* {isLoading && data && todo.id === data["id"] ? (
-                          <IoAirplane size={18} />
-                        ) : (
-                          <IoClose size={18} />
-                        )} */}
                       </button>
                     </div>
                   </div>
@@ -132,6 +144,17 @@ const Home: NextPage = () => {
               <ScrollArea.Corner className="bg-blackA8"></ScrollArea.Corner>
             </ScrollArea.Root>
           </div>
+          <p className="text-xs text-gray-400">
+            built by your truely{" "}
+            <span className="text-blue-600 hover:underline">
+              <a
+                href="https://portfolio-bornunnusual.vercel.app/"
+                target="_blank"
+              >
+                Chhun Viphou
+              </a>
+            </span>
+          </p>
         </div>
       </main>
     </>
